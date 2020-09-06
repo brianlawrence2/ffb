@@ -1,4 +1,5 @@
 library(tidyverse)
+library(rvest)
 
 scrape_season_html <- function(season = 2019) {
   url = str_c("https://www.pro-football-reference.com/years/", season, "/fantasy.htm#fantasy::none", sep = "")
@@ -16,7 +17,7 @@ get_column_names <- function(tbl) {
     unite(`1`, `2`, col = "col_names", sep = "_") %>%
     select(col_names)
   
-  return(cols)
+  return(cols$col_names)
 }
 
 format_season <- function(season_html) {
@@ -25,7 +26,7 @@ format_season <- function(season_html) {
     html_table(header = FALSE)
   
   season_tbl <- season_l[[1]]
-  col_names(season_tbl) <- get_column_names(season_tbl)
+  colnames(season_tbl) <- season_tbl %>% get_column_names
   season_tbl <- season_tbl %>% slice(3:n())
   
   return(season_tbl)
@@ -37,3 +38,7 @@ scrape_season <- function(season = 2019) {
       format_season
   )
 }
+
+
+
+scrape_season(2019)
