@@ -153,8 +153,8 @@ scrape_season <- function(season = 2019) {
     calculate_league_rank %>%
     calculate_league_vbd(settings)
   
+  season_data$season <- season
+  
   return(season_data)
 }
-
-season <- scrape_season(2019)
 
