@@ -4,6 +4,10 @@ library(glue)
 
 settings <- list(
   teams = 12,
+  qbs = 1,
+  wrs = 2,
+  rbs = 2,
+  tes = 1,
   passing_yards = 25,
   passing_td = 6,
   int = -2,
@@ -80,6 +84,49 @@ calculate_league_scoring <- function(season, settings) {
   return(season)
 }
 
+calculate_league_vbd <- function(season, settings) {
+  rep_qb <- season %>% 
+    filter(FantPos == 'QB' & league_pos_rank == settings$teams * settings$qbs)
+  
+  rep_rb <- season %>% 
+    filter(FantPos == 'RB' & league_pos_rank == settings$teams * settings$rbs)
+  
+  rep_wr <- season %>% 
+    filter(FantPos == 'WR' & league_pos_rank == settings$teams * settings$wrs)
+  
+  rep_te <- season %>% 
+    filter(FantPos == 'TE' & league_pos_rank == settings$teams * settings$tes)
+  
+  season_qb <- season %>%
+    filter(FantPos == 'QB') %>%
+    mutate(
+      league_vbd = league_score - rep_qb$league_score
+    )
+  
+  season_rb <- season %>%
+    filter(FantPos == 'RB') %>%
+    mutate(
+      league_vbd = league_score - rep_rb$league_score
+    )
+    
+  season_wr <- season %>%
+    filter(FantPos == 'WR') %>%
+    mutate(
+      league_vbd = league_score - rep_wr$league_score
+    )
+  
+  season_te <- season %>%
+    filter(FantPos == 'TE') %>%
+    mutate(
+      league_vbd = league_score - rep_te$league_score
+    )
+  
+  season <- season_qb %>%
+    bind_rows(season_rb, season_wr, season_te)
+  
+  return(season)
+}
+
 calculate_league_rank <- function(season) {
   season <- season %>%
     mutate(
@@ -103,8 +150,11 @@ scrape_season <- function(season = 2019) {
       across(everything(), ~replace_na(.x, 0))
     ) %>%
     calculate_league_scoring(settings) %>%
-    calculate_league_rank
+    calculate_league_rank %>%
+    calculate_league_vbd(settings)
   
   return(season_data)
 }
+
+season <- scrape_season(2019)
 
