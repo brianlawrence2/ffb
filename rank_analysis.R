@@ -20,6 +20,10 @@ ggplot(position_vbd, aes(league_pos_rank, pos_rank_vbd)) +
   geom_point() +
   facet_wrap(vars(FantPos))
 
+position_vbd %>%
+  ggplot(aes(league_pos_rank, pos_rank_vbd, fill=FantPos, color=FantPos)) +
+  geom_point() 
+
 
 
 
